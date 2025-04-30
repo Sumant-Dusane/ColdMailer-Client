@@ -1,34 +1,38 @@
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { crx, ManifestV3Export } from "@crxjs/vite-plugin";
+import manifestJson from "./public/manifest.json";
 
-// https://vite.dev/config/
+const manifest = manifestJson as unknown as ManifestV3Export;
+
+const viteManifestHackIssue846: Plugin & {
+  renderCrxManifest: (manifest: any, bundle: any) => void;
+} = {
+  // Workaround from https://github.com/crxjs/chrome-extension-tools/issues/846#issuecomment-1861880919.
+  name: "manifestHackIssue846",
+  renderCrxManifest(_manifest: any, bundle: any) {
+    bundle["manifest.json"] = bundle[".vite/manifest.json"];
+    bundle["manifest.json"].fileName = "manifest.json";
+    delete bundle[".vite/manifest.json"];
+  },
+};
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), viteManifestHackIssue846, crx({ manifest })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
-    emptyOutDir: false,
-    outDir: "dist",
-    rollupOptions: {
-      input: {
-        popup: path.resolve(__dirname, "index.html"),
-        content_script: path.resolve(__dirname, "src/content/index.ts"),
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === "content_script"
-            ? "assets/content_script.js"
-            : "assets/[name]-[hash].js";
-        },
-        chunkFileNames: "assets/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash].[ext]",
-        format: "es",
-      },
+    sourcemap: true,
+    copyPublicDir: false,
+    emptyOutDir: true,
+    modulePreload: {
+      polyfill: false,
     },
+    manifest: false,
+    rollupOptions: {},
   },
 });

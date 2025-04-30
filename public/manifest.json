@@ -9,7 +9,7 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["content-loader.js"],
+      "js": ["src/content/index.ts"],
       "run_at": "document_idle"
     }
   ],
@@ -18,8 +18,8 @@
   "host_permissions": ["https://mail.google.com/"],
   "web_accessible_resources": [
     {
-      "resources": ["assets/*", "content-loader.js"],
-      "matches": ["*://mail.google.com/*"]
+      "resources": ["assets/*"],
+      "matches": ["https://mail.google.com/*"]
     }
   ]
 }
