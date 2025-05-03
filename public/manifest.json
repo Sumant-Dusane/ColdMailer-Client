@@ -6,20 +6,21 @@
   "action": {
     "default_popup": "index.html"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://mail.google.com/*"],
-      "js": ["content-loader.js"],
-      "run_at": "document_idle"
-    }
+  "permissions": [
+    "scripting",
+    "activeTab"
   ],
-  "background": {},
-  "permissions": ["scripting", "activeTab"],
-  "host_permissions": ["https://mail.google.com/"],
+  "host_permissions": [
+    "https://mail.google.com/"
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/*", "content-loader.js"],
-      "matches": ["*://mail.google.com/*"]
+      "resources": [
+        "assets/*"
+      ],
+      "matches": [
+        "*://mail.google.com/*"
+      ]
     }
   ]
 }
